@@ -37,7 +37,7 @@ La aplicación está desarrollada utilizando **FastAPI** para el backend y una b
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone <URL-DEL-REPOSITORIO>
+git clone https://github.com/JMGurtubay/Movie_Club.git
 cd movie-club
 ```
 
