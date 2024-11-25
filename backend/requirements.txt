@@ -1,0 +1,5 @@
+fastapi==0.100.0  # Framework principal para tu API
+pymongo==4.3.3  # Cliente de MongoDB
+pydantic==2.2.1  # Validación y modelado de datos
+pydantic-settings==2.0.3  # Configuración basada en Pydantic
+uvicorn[standard]==0.23.2  # Servidor ASGI recomendado para FastAPI
