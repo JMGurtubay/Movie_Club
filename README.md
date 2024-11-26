@@ -38,7 +38,7 @@ La aplicación está desarrollada utilizando **FastAPI** para el backend y una b
 
 ```bash
 git clone https://github.com/JMGurtubay/Movie_Club.git
-cd movie-club
+cd Movie-Club
 ```
 
 ### 2. Configurar Docker Desktop o Docker Engine
@@ -82,21 +82,44 @@ En el directorio raíz del proyecto (`movie-club`), ejecuta los siguientes coman
 
 ---
 
-### 4. Probar la Aplicación
+### 4. Probar las apis con pytest
+1. Entrar al contenedor tanto del backend como de Mongo
+   ```bash
+   docker ps
+   ```
+   ```bash
+   docker exec -it [id_cont] bash
+   ```
 
-1. Abre tu navegador y accede a:
-   - **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
-   - **Documentación alternativa (ReDoc)**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+2. Dentro del contenedor del backend corre el pytests
+   ```bash
+   pytests app/tests/movies_test.py
+   ```
+    ```bash
+   pytests app/tests/theater_test.py
+   ```
+   ```bash
+   pytests app/tests/users_test.py
+   ```
+   ```bash
+   pytests app/tests/reservations_test.py
+   ```
+   
+### 5. Probar las apis desde el navegador
+1. Si decidiste correr los contenedores desde sl subsistema de linux WSL primero debes de obtener la ip del subsistema
+   ```bash
+   hostname -I
+   ```
+   La primer ip que aparezca es la que necesitamos, copiala y pegala en el navegador junto con el puerto :8000 y el endpoint de la documentacion de OpenAPI /docs
 
-2. Usa los endpoints para realizar pruebas:
-   - Consultar películas.
-   - Crear una sala de proyección.
-   - Realizar una reserva.
-   - Verificar conflictos de horario.
+   Si decidiste hacerlo desde Docker Desktop no necesitas obtener la ip, unicamente coloca localhost en el navegador junto con el puerto y el endpoint
 
+3. Dejo un ejemplo para ver como se veria la url del navegador 
+    http://localhost:8000/docs
+    http://172.25.106.67:8000/docs
 ---
 
-### 5. Detener los Contenedores
+### 6. Detener los Contenedores
 
 Para detener los contenedores sin eliminar los datos:
 
