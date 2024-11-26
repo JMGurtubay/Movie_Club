@@ -9,9 +9,7 @@ theaters_collection = db["theaters"]
 
 def get_all_theaters_service() -> List[TheaterDB]:
     try:
-        print('Entra al servicio')
         theaters_cursor = theaters_collection.find({})
-        print('lista de peliculas')
         theaters = [
             TheaterDB(
                 id=str(theater["_id"]),
@@ -43,7 +41,7 @@ def get_theater_by_id_service(theater_id: str) -> TheaterDB:
     except PyMongoError as e:
         raise RuntimeError(f"Database error: {str(e)}")
 
-def create_theater_service(theater_data: TheaterRequest):
+def create_theater_service(theater_data: TheaterRequest)-> TheaterDB:
     try:
         result = theaters_collection.insert_one(theater_data.model_dump(exclude={"id"}))
 
@@ -59,44 +57,37 @@ def create_theater_service(theater_data: TheaterRequest):
         )
 
     except PyMongoError as e:
-        print('Mongo')
         raise RuntimeError(f"Database error: {str(e)}")
 
 def update_theater_service(theater_id: str, theater_data: TheaterRequest) -> TheaterDB:
     try:
-        # Actualizar el documento en MongoDB
         result = theaters_collection.update_one(
             {"_id": ObjectId(theater_id)},
             {"$set": theater_data.model_dump(exclude={"id"})}
         )
 
-        # Verificar si se modificó algún documento
         if result.matched_count == 0:
             raise ValueError(f"No se encontró ninguna película con el ID proporcionado: {theater_id}")
 
-        # Obtener la película actualizada para regresarla como respuesta
         updated_theater = theaters_collection.find_one({"_id": ObjectId(theater_id)})
 
-        # Convertir el resultado a un objeto TheaterDB
         return TheaterDB(**updated_theater)
         
     except PyMongoError as e:
-        print('Mongo')
         raise RuntimeError(f"Database error: {str(e)}")
 
 def delete_theater_service(theater_id: str) -> bool:
     try:
 
-        # Intentar eliminar la película de la base de datos
+ 
         result = theaters_collection.delete_one({"_id": ObjectId(theater_id)})
 
-        # Verificar si se eliminó algún documento
+  
         if result.deleted_count == 0:
             raise ValueError(f"No se encontró ninguna película con el ID proporcionado: {theater_id}")
 
-        return True  # Indica que la película fue eliminada exitosamente
+        return True 
 
     except PyMongoError as e:
-        print('Mongo')
         raise RuntimeError(f"Database error: {str(e)}")
 

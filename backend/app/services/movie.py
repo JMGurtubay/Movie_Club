@@ -45,7 +45,7 @@ def get_movie_by_id_service(movie_id: str) -> MovieDB:
     except PyMongoError as e:
         raise RuntimeError(f"Database error: {str(e)}")
 
-def create_movie_service(movie_data: MovieRequest):
+def create_movie_service(movie_data: MovieRequest) -> MovieDB:
     try:
         result = movies_collection.insert_one(movie_data.model_dump(exclude={"id"}))
 

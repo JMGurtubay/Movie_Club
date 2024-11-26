@@ -1,10 +1,46 @@
 from fastapi import HTTPException
 from datetime import datetime, date, time
+
+from jose import jwt
 from app.database.connection import db
 from bson import ObjectId
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from typing import Annotated, Dict
+
 
 reservations_collection=db["reservations"]
 movies_collection=db["movies"]
+users_collection = db["users"]
+
+
+SECRET_KEY = "super53Cr37Pa$$w0rd"
+ALGORITHM = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
+
+
+def encode_token(payload: dict) -> str:
+    """
+    Genera un token JWT basado en el payload proporcionado.
+
+    :param payload: Información a incluir en el token.
+    :return: Token JWT codificado como string.
+    """
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return token
+
+def decode_token(token:Annotated[str, Depends(oauth2_scheme)]) -> str:
+    """
+    Decodifica un token JWT para obtener el payload.
+
+    :param token: Token JWT proporcionado.
+    :return: Información decodificada del token.
+    """
+    data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    user = users_collection.find_one({"username": data["username"]})
+    # user=users.get(data["username"])
+    return user
+
 
 def validate_object_id(id: str) -> ObjectId:
     """
@@ -67,11 +103,9 @@ def validate_theater_availability(theater_id: str, reservation_date: datetime, s
         "theater_id": ObjectId(theater_id),
         "reservation_date": reservation_date
     }))
-    # print(existing_reservations)
 
     # Ordenar reservaciones existentes por horario de inicio
     existing_reservations.sort(key=lambda x: x["start_time"])
-    # print(existing_reservations)
 
     # Calcular espacios disponibles
     open_time = datetime.combine(reservation_date.date(), time(9, 0))
@@ -184,3 +218,48 @@ def format_datetime_fields(reservation_data: dict) -> dict:
     reservation_data["end_time"] = reservation_data["end_time"].time().replace(second=0)  
     reservation_data["reservation_date"] = reservation_data["reservation_date"].date()  # Convertir a date
     return reservation_data
+
+
+def validate_user_unique(username: str, email: str):
+    """
+    Valida que el nombre de usuario o correo electrónico no existan previamente en la base de datos.
+
+    Descripción:
+    Esta función verifica si ya existe un usuario en la base de datos con el mismo nombre de usuario (`username`) 
+    o correo electrónico (`email`). Si se detecta un conflicto, se lanza un `ValueError` con un mensaje 
+    estructurado que incluye detalles del error.
+
+    Parámetros:
+    - username (str): El nombre de usuario proporcionado.
+    - email (str): El correo electrónico proporcionado.
+    - users_collection (Collection): La colección de MongoDB que contiene los registros de usuarios.
+
+    Respuesta:
+    - Si no se detecta un conflicto, no retorna nada.
+    - Si el nombre de usuario o correo electrónico ya existen:
+        Lanza un ValueError con la siguiente estructura:
+        {
+            "message": "El usuario ya existe.",
+            "description": "El nombre de usuario o correo electrónico ya están registrados en el sistema.",
+            "data": {
+                "username": <nombre_de_usuario>,
+                "email": <correo_electronico>
+            }
+        }
+    """
+    existing_user = users_collection.find_one({
+        "$or": [
+            {"username": username},
+            {"email": email}
+        ]
+    })
+
+    if existing_user:
+        raise ValueError({
+            "message": "El usuario ya existe.",
+            "description": "El nombre de usuario o correo electrónico ya están registrados en el sistema.",
+            "data": {
+                "username": username,
+                "email": email
+            }
+        })

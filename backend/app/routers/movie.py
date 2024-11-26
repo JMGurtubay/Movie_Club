@@ -22,9 +22,7 @@ def get_movies():
         - data: Lista de películas obtenidas.
     """
     try:
-        print('Entra a la ruta')
         movies = get_all_movies_service()
-        print('Servicio exitoso')
         return MovieResponse(
             code=200,
             message="Películas obtenidas con éxito.",
@@ -64,7 +62,7 @@ def get_movie(movie_id: str):
             code=200,
             message="Película obtenida con éxito.",
             description="Se obtuvo correctamente la película solicitada.",
-            data=movie  # Objeto MovieDB
+            data=movie
         )
     except HTTPException:
         raise
@@ -101,10 +99,7 @@ def create_movie(movie: MovieRequest):
         - data: Objeto con los datos de la película creada.
     """
     try:
-        print('Entra a la ruta')
         created_movie = create_movie_service(movie)
-        print('corre el servicio')
-        print(created_movie)
         return MovieResponse(
             code=200,
             message="La película ha sido creada exitosamente.",

@@ -20,9 +20,7 @@ def get_theaters():
         - data: Lista de salas de proyección obtenidas.
     """
     try:
-        print('Entra a la ruta')
         theaters = get_all_theaters_service()
-        print('Servicio exitoso')
         return TheaterResponse(
             code=200,
             message="Salas de proyección obtenidas con éxito.",
@@ -99,10 +97,7 @@ def create_theater(theater: TheaterRequest):
         - data: Objeto con los datos de la sala de proyección creada.
     """
     try:
-        print('Entra a la ruta')
         created_theater = create_theater_service(theater)
-        print('corre el servicio')
-        print(created_theater)
         return TheaterResponse(
             code=200,
             message="La sala de proyección ha sido creada exitosamente.",

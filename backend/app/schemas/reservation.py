@@ -3,13 +3,13 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, validator
 from bson import ObjectId
 from collections import OrderedDict
 from typing import List, Optional, Dict, Union
-from datetime import datetime, time, date
+from datetime import datetime
 from app.models.reservation import ReservationDB
 from app.shared.utils import validate_object_id
 
 
 class ReservationRequest(BaseModel):
-    user_id: str
+    user_id: Optional[str] = Field(default=None)
     theater_id: str
     movie_id: str
     is_private: bool
@@ -22,12 +22,12 @@ class ReservationRequest(BaseModel):
         # Validar los IDs usando la función validate_object_id
         self.theater_id = validate_object_id(self.theater_id)
         self.movie_id = validate_object_id(self.movie_id)
+        self.user_id = validate_object_id(self.user_id)
 
     # Validadores para aceptar formatos legibles
     @field_validator("start_time", "end_time", mode="before")
     def parse_time(cls, value: str):
         try:
-            # Combina una fecha ficticia para aceptar solo "HH:mm"
             return datetime.strptime(f"1970-01-01 {value}", "%Y-%m-%d %H:%M")
         except ValueError:
             raise ValueError(f"Invalid time format. Use 'HH:mm'. Received: {value}")
@@ -46,7 +46,6 @@ class ReservationRequest(BaseModel):
         },
         json_schema_extra={
             "example": OrderedDict(
-                user_id="user123",
                 theater_id="64f1a4b2e3c9a5508d1e82e4",
                 movie_id="64f1a4b2e3c9a5508d1e82e5",
                 is_private=True,
@@ -66,4 +65,4 @@ class ReservationResponse(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        # json_encoders = {ObjectId: str}

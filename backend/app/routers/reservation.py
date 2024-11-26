@@ -1,8 +1,8 @@
-# routes/reservations.py
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.reservation import ReservationRequest, ReservationResponse
 from app.services.reservation import create_reservation_service,get_all_reservations_service,get_reservation_by_id_service,delete_reservation_service,update_reservation_service
-from app.shared.utils import validate_object_id, validate_reservation_time, validate_theater_availability,validate_movie_duration
+from app.shared.utils import decode_token, validate_object_id, validate_reservation_time, validate_theater_availability,validate_movie_duration
 from app.shared.exceptions import BusinessLogicError
 
 router = APIRouter()
@@ -22,9 +22,7 @@ def get_reservations():
         - data: Lista de reservaciones obtenidas.
     """
     try:
-        print('Entra a la ruta')
         reservations = get_all_reservations_service()
-        print('Servicio exitoso')
         return ReservationResponse(
             code=200,
             message="Reservaciones obtenidas con éxito.",
@@ -87,7 +85,7 @@ def get_reservation(reservation_id: str):
 
 
 @router.post("/", response_model=ReservationResponse)
-def create_reservation(reservation: ReservationRequest):
+def create_reservation(reservation: ReservationRequest, user:Annotated[dict, Depends(decode_token)]):
     """
     Crea una nueva reservación en la base de datos.
 
@@ -101,7 +99,6 @@ def create_reservation(reservation: ReservationRequest):
         - data: Objeto con los datos de la reservación creada.
     """
     try:
-        print("Entra a la ruta")
         validate_reservation_time(reservation.start_time, reservation.end_time)
         validate_theater_availability(
             reservation.theater_id,
@@ -109,14 +106,12 @@ def create_reservation(reservation: ReservationRequest):
             reservation.start_time,
             reservation.end_time
         )
-        print('aqui va el servicio')
         validate_movie_duration(
             reservation.movie_id,
             reservation.start_time,
             reservation.end_time
         )
-        print('aqui va el servicio2')
-        created_reservation = create_reservation_service(reservation)
+        created_reservation = create_reservation_service(reservation, str(user["_id"]))
 
         return ReservationResponse(
             code=200,
@@ -152,9 +147,7 @@ def update_reservation(reservation_id: str, reservation: ReservationRequest):
     """
     try:
         validate_object_id(reservation_id)
-        print('aqui vamos')
         updated_reservation = update_reservation_service(reservation_id, reservation)
-        print('ya no fuimos')
         return ReservationResponse(
             code=200,
             message="La reservación ha sido actualizada exitosamente.",
