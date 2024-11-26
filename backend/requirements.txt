@@ -5,5 +5,5 @@ pydantic-settings==2.0.3  # Configuración basada en Pydantic
 uvicorn[standard]==0.23.2  # Servidor ASGI recomendado para FastAPI
 python-multipart==0.0.6  # Para manejar formularios en FastAPI
 python-jose==3.3.0
-pytest
+python3-pytest
 httpx
