@@ -31,7 +31,7 @@ def test_get_user_by_id(client):
     user_response = client.post("/user", json={
         "username": "Sandra",
         "password": "Pa$$w0rd",
-        "email":"user123@example.com"
+        "email":"sandra@example.com"
     })
     user_id = user_response.json()["data"]["id"]
 
