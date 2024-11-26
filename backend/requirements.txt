@@ -4,6 +4,6 @@ pydantic==2.2.1  # Validación y modelado de datos
 pydantic-settings==2.0.3  # Configuración basada en Pydantic
 uvicorn[standard]==0.23.2  # Servidor ASGI recomendado para FastAPI
 python-multipart==0.0.6  # Para manejar formularios en FastAPI
-python-jose==3.3.0
-python3-pytest
-httpx
+python-jose==3.3.0  # Para manejo de JWT
+pytest==8.3.3  # Framework de pruebas
+httpx==0.24.1  # Cliente HTTP
