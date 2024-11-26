@@ -104,6 +104,27 @@ En el directorio raíz del proyecto (`movie-club`), ejecuta los siguientes coman
    ```bash
    pytests app/tests/reservations_test.py
    ```
+
+   IMPORTANTE!! Es probable que al tratar de hacer el pytests de users no pasen todas las pruebas porque hay validaciones que no permites crear usuarios con el mismo nombre o email
+
+   Para resovlerlos una vez dentro del contenedor:
+   Entrar al mongo shell
+   ```bash
+   mongosh
+   ```
+   Entrar a la base de datos
+   ```bash
+   use movie_club
+   ```
+   Hacer un drop de de la coleccion de users
+   ```bash
+   db.users.drop()
+   ```
+
+   Volver a ejectutar el pytest de users
+   ```bash
+   pytests app/tests/users_test.py
+   ```
    
 ### 5. Probar las apis desde el navegador
 1. Si decidiste correr los contenedores desde sl subsistema de linux WSL primero debes de obtener la ip del subsistema
